@@ -5,11 +5,11 @@ import pandas as pd
 import tensorflow as tf
 from sklearn.linear_model import LogisticRegression
 
-def train_with_reg_cv(trX, trY, vaX, vaY, teX=None, teY=None, penalty='l1',
+def train_with_reg_cv(trX, trY, vaX, vaY, teX=None, teY=None, penalty='l2',
         C=2**np.arange(-8, 1).astype(np.float), seed=42):
     scores = []
     for i, c in enumerate(C):
-        model = LogisticRegression(C=c, penalty=penalty, random_state=seed+i)
+        model = LogisticRegression(C=c, penalty=penalty, random_state=seed+i, multi_class = 'multinomial', solver = 'lbfgs')
         model.fit(trX, trY)
         score = model.score(vaX, vaY)
         scores.append(score)
@@ -24,10 +24,10 @@ def train_with_reg_cv(trX, trY, vaX, vaY, teX=None, teY=None, penalty='l1',
     return score, c, nnotzero
 
 
-def load_sst(path):
+def load_sst(path, sent_key, pol_key):
     data = pd.read_csv(path)
-    X = data['sentence'].values.tolist()
-    Y = data['label'].values
+    X = data[sent_key].values.tolist()
+    Y = data[pol_key].values
     return X, Y
 
 
@@ -38,9 +38,14 @@ def sst_binary(data_dir='data/'):
     of the dataset using the raw text instead which we've included in the data
     folder.
     """
-    trX, trY = load_sst(os.path.join(data_dir, 'train_binary_sent.csv'))
-    vaX, vaY = load_sst(os.path.join(data_dir, 'dev_binary_sent.csv'))
-    teX, teY = load_sst(os.path.join(data_dir, 'test_binary_sent.csv'))
+    #trX, trY = load_sst(os.path.join(data_dir, 'train_binary_sent.csv'))
+    #vaX, vaY = load_sst(os.path.join(data_dir, 'dev_binary_sent.csv'))
+    #teX, teY = load_sst(os.path.join(data_dir, 'test_binary_sent.csv'))
+    trX, trY = load_sst("/home/arya_03/deepak/generating-reviews-discovering-sentiment/data/all_reviews_amazon_yelp_imdb.csv", "sentence", "polarity")
+    vaX, vaY = load_sst("/home/arya_03/deepak/generating-reviews-discovering-sentiment/data/labelled_data.csv", "Sentence", "Polarity")
+    teX, teY = load_sst("/home/arya_03/deepak/generating-reviews-discovering-sentiment/data/labelled_data.csv", "Sentence", "Polarity")
+    #teX, teY = load_sst(os.path.join(data_dir, 'test_binary_sent.csv'))
+    
     return trX, vaX, teX, trY, vaY, teY
 
 

@@ -1,1 +1,4 @@
 labelled_data.csv
+*.sw*
+*.pyc
+*.pkl
